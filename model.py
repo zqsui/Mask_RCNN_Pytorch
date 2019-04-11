@@ -63,10 +63,10 @@ class SamePad2d(nn.Module):
                            self.kernel_size[0] - in_width)
         pad_along_height = ((out_height - 1) * self.stride[1] +
                             self.kernel_size[1] - in_height)
-        pad_left = math.floor(pad_along_width / 2)
-        pad_top = math.floor(pad_along_height / 2)
-        pad_right = pad_along_width - pad_left
-        pad_bottom = pad_along_height - pad_top
+        pad_left = int(math.floor(pad_along_width / 2))
+        pad_top = int(math.floor(pad_along_height / 2))
+        pad_right = int(pad_along_width - pad_left)
+        pad_bottom = int(pad_along_height - pad_top)
         return F.pad(input, (pad_left, pad_right, pad_top, pad_bottom), 'constant', 0)
 
     def __repr__(self):

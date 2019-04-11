@@ -13,6 +13,7 @@ import model as modellib
 import visualize
 
 import torch
+import time
 
 
 # Root directory of the project
@@ -24,7 +25,7 @@ MODEL_DIR = os.path.join(ROOT_DIR, "logs")
 # Path to trained weights file
 # Download this file and place in the root of your
 # project (See README file for details)
-COCO_MODEL_PATH = os.path.join(ROOT_DIR, "mask_rcnn_coco.pth")
+COCO_MODEL_PATH = os.path.join(ROOT_DIR, "trained_models", "mask_rcnn_coco.pth")
 
 # Directory of images to run detection on
 IMAGE_DIR = os.path.join(ROOT_DIR, "images")
@@ -68,13 +69,19 @@ class_names = ['BG', 'person', 'bicycle', 'car', 'motorcycle', 'airplane',
 
 # Load a random image from the images folder
 file_names = next(os.walk(IMAGE_DIR))[2]
-image = skimage.io.imread(os.path.join(IMAGE_DIR, random.choice(file_names)))
+for rand_name in file_names:
+	image = skimage.io.imread(os.path.join(IMAGE_DIR, rand_name))
+	print rand_name
 
-# Run detection
-results = model.detect([image])
+	cur_time = time.time()
+	# Run detection
+	results = model.detect([image], torch.device("cuda"))
+	print time.time() - cur_time
+	print results
 
-# Visualize results
-r = results[0]
-visualize.display_instances(image, r['rois'], r['masks'], r['class_ids'],
-                            class_names, r['scores'])
-plt.show()
+
+	# Visualize results
+	r = results[0]
+	visualize.display_instances(image, r['rois'], r['masks'], r['class_ids'],
+	                            class_names, r['scores'])
+	plt.show()
