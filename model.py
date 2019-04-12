@@ -749,7 +749,10 @@ def refine_detections(rois, probs, deltas, window, config):
     # Filter out low confidence boxes
     if config.DETECTION_MIN_CONFIDENCE:
         keep_bool = keep_bool & (class_scores >= config.DETECTION_MIN_CONFIDENCE)
-    keep = torch.nonzero(keep_bool)[:,0]
+    if torch.nonzero(keep_bool).size()[0]:
+        keep = torch.nonzero(keep_bool)[:,0]
+    else:
+        keep = torch.from_numpy(np.array([1]))
 
     # Apply per-class NMS
     pre_nms_class_ids = class_ids[keep.data]
@@ -1451,7 +1454,8 @@ class MaskRCNN(nn.Module):
 
         for param in self.named_parameters():
             layer_name = param[0]
-            trainable = bool(re.fullmatch(layer_regex, layer_name))
+            #trainable = bool(re.fullmatch(layer_regex, layer_name))
+            trainable = bool(re.match(layer_regex, layer_name))
             if not trainable:
                 param[1].requires_grad = False
 
@@ -1718,8 +1722,11 @@ class MaskRCNN(nn.Module):
                 # and zero padded.
                 proposal_count = self.config.POST_NMS_ROIS_TRAINING
 
+                #print len(image_metas_batch)
                 # compute the losses for each batch
-                for i in range(BatchSize):
+                #for i in range(BatchSize):
+                for i in range(len(image_metas_batch)):
+                        #print "compute losses at: ", i
                         # from list to tensor
                         image_metas=image_metas_batch[i]
                         rpn_class_logits=rpn_class_logits_batch[i]

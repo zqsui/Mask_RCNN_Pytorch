@@ -29,7 +29,7 @@ device=torch.device("cuda")
 #COCO_MODEL_PATH = os.path.join(ROOT_DIR, "mask_rcnn_coco.pth")
 
 # Directory of images to run detection on
-IMAGE_DIR = os.path.join(ROOT_DIR, "images")
+IMAGE_DIR = os.path.join(ROOT_DIR, "images_synthia")
 
 class synthiaConfig(Config):
     """Configuration for training on the toy shapes dataset.
@@ -86,7 +86,7 @@ if config.GPU_COUNT:
 
 # Load weights trained on MS-COCO
 #model.load_state_dict(torch.load(COCO_MODEL_PATH))
-model_path = "/mnt/backup/jianyuan/pytorch-mask-rcnn/logs/synthia20180907T2148/mask_rcnn_synthia_0002.pth"
+model_path = "logs/synthia20190411T2258/mask_rcnn_synthia_0015.pth"
 #model.find_last()[1]
 model.load_weights(model_path)
 # COCO Class names
@@ -96,13 +96,16 @@ class_names = ["BG", "sky","Building","Road", "Sidewalk","Fence", "Vegetation","
 
 # Load a random image from the images folder
 file_names = next(os.walk(IMAGE_DIR))[2]
-image = skimage.io.imread(os.path.join(IMAGE_DIR, random.choice(file_names)))
 
-# Run detection
-results = model.detect([image],device)
+for file_name in file_names:
+    image = skimage.io.imread(os.path.join(IMAGE_DIR, file_name))
 
-# Visualize results
-r = results[0]
-visualize.display_instances(image, r['rois'], r['masks'], r['class_ids'],
-                            class_names, r['scores'])
-plt.show()
+    # Run detection
+    results = model.detect([image],device)
+
+    # Visualize results
+    r = results[0]
+    print r['class_ids']
+    visualize.display_instances(image, r['rois'], r['masks'], r['class_ids'],
+                                class_names, r['scores'])
+    plt.show()

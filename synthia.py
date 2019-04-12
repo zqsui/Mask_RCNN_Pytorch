@@ -43,7 +43,7 @@ import skimage.transform
 
 
 import zipfile
-import urllib.request
+#import urllib.request
 import shutil
 
 from config import Config
@@ -56,7 +56,7 @@ import torch
 ROOT_DIR = os.getcwd()
 
 # Path to trained weights file
-COCO_MODEL_PATH = os.path.join(ROOT_DIR, "mask_rcnn_coco.pth")
+COCO_MODEL_PATH = os.path.join(ROOT_DIR, "trained_models", "mask_rcnn_coco.pth")
 
 # Directory to save logs and model checkpoints, if not provided
 # through the command line argument --logs
@@ -132,13 +132,15 @@ class synthiaDataset(utils.Dataset):
         
         for image_id in image_ids:
             if int(image_id)<201:
-                Path=os.path.join(dataset_dir, "val","{}.png".format(image_id))
+                #Path=os.path.join(dataset_dir, "val","{}.png".format(image_id))
+                Path=os.path.join(dataset_dir,"{}.png".format(image_id))
                 self.add_image(
                     "synthia",
                     image_id=image_id,
                     path=Path)
             else:
-                Path=os.path.join(dataset_dir, "train","{}.png".format(image_id))
+                #Path=os.path.join(dataset_dir, "train","{}.png".format(image_id))
+                Path=os.path.join(dataset_dir,"{}.png".format(image_id))
                 self.add_image(
                     "synthia",
                     image_id=image_id,
@@ -147,6 +149,9 @@ class synthiaDataset(utils.Dataset):
     def load_image(self, image_id):
         """Load the specified image and return a [H,W,4] Numpy array.
         """
+        # this image_id is different from the image_id in the load_synthia function
+        # this image_id is the index of the image in the dataset object
+        # image_id in the load_synthia is the name of the image
         # Load image
         imgPath = self.image_info[image_id]['path']
         img=skimage.io.imread(imgPath)
@@ -165,8 +170,9 @@ class synthiaDataset(utils.Dataset):
         """
         info = self.image_info[image_id]
         path=info['path']
-        mpath=path.replace("RGB","GT")
+        mpath=path.replace("RGB","GT/LABELS")
         label=cv2.imread(mpath,cv2.IMREAD_UNCHANGED)
+        #print mpath
         raw_mask=label[:,:,1]
         number=np.unique(raw_mask)
         number=number[1:]

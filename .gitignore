@@ -5,3 +5,7 @@
 *.so
 
 pycocotools
+
+images_synthia
+
+logs
