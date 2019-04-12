@@ -66,59 +66,58 @@ DEFAULT_LOGS_DIR = os.path.join(ROOT_DIR, "logs")
 #  Configurations
 ############################################################
 
-class synthiaConfig(Config):
+class ycbConfig(Config):
     """Configuration for training on the toy shapes dataset.
     Derives from the base Config class and overrides values specific
     to the toy shapes dataset.
     """
     # Give the configuration a recognizable name
-    NAME = "synthia"
+    NAME = "ycb"
 
     # Number of classes (including background)
-    NUM_CLASSES = 1 + 22  # background + 22 shapes
+    NUM_CLASSES = 1 + 21  # background + 22 shapes
 
-    IMAGE_MIN_DIM = 760
-    IMAGE_MAX_DIM = 1280
+    IMAGE_MIN_DIM = 480
+    IMAGE_MAX_DIM = 640
 
 
 ############################################################
 #  Dataset
 ############################################################
 
-class synthiaDataset(utils.Dataset):
+class ycbDataset(utils.Dataset):
     """Generates the shapes synthetic dataset. The dataset consists of simple
     shapes (triangles, squares, circles) placed randomly on a blank surface.
     The images are generated on the fly. No file access required.
     """
 
-    def load_synthia(self, dataset_dir,subset):
+    def load_ycb(self, dataset_dir,subset):
         """Generate the requested number of synthetic images.
         count: number of images to generate.
         height, width: the size of the generated images.
         """
         # Add classes
-        self.add_class("synthia", 1, "sky")
-        self.add_class("synthia", 2, "Building")
-        self.add_class("synthia", 3, "Road")
-        self.add_class("synthia", 4, "Sidewalk")
-        self.add_class("synthia", 5, "Fence")
-        self.add_class("synthia", 6, "Vegetation")
-        self.add_class("synthia", 7, "Pole")
-        self.add_class("synthia", 8, "Car")
-        self.add_class("synthia", 9, "Traffic sign")
-        self.add_class("synthia", 10, "Pedestrian")
-        self.add_class("synthia", 11, "Bicycle")
-        self.add_class("synthia", 12, "Motorcycle")
-        self.add_class("synthia", 13, "Parking-slot")
-        self.add_class("synthia", 14, "Road-work")
-        self.add_class("synthia", 15, "Traffic light")
-        self.add_class("synthia", 16, "Terrain")
-        self.add_class("synthia", 17, "Rider")
-        self.add_class("synthia", 18, "Truck")
-        self.add_class("synthia", 19, "Bus")
-        self.add_class("synthia", 20, "Train")
-        self.add_class("synthia", 21, "Wall")
-        self.add_class("synthia", 22, "Lanemarking")        
+        self.add_class("ycb", 1, "002_master_chef_can")
+        self.add_class("ycb", 2, "003_cracker_box")
+        self.add_class("ycb", 3, "004_sugar_box")
+        self.add_class("ycb", 4, "005_tomato_soup_can")
+        self.add_class("ycb", 5, "006_mustard_bottle")
+        self.add_class("ycb", 6, "007_tuna_fish_can")
+        self.add_class("ycb", 7, "008_pudding_box")
+        self.add_class("ycb", 8, "009_gelatin_box")
+        self.add_class("ycb", 9, "010_potted_meat_can")
+        self.add_class("ycb", 10, "011_banana")
+        self.add_class("ycb", 11, "019_pitcher_base")
+        self.add_class("ycb", 12, "021_bleach_cleanser")
+        self.add_class("ycb", 13, "024_bowl")
+        self.add_class("ycb", 14, "025_mug")
+        self.add_class("ycb", 15, "035_power_drill")
+        self.add_class("ycb", 16, "036_wood_block")
+        self.add_class("ycb", 17, "037_scissors")
+        self.add_class("ycb", 18, "040_large_marker")
+        self.add_class("ycb", 19, "051_large_clamp")
+        self.add_class("ycb", 20, "052_extra_large_clamp")
+        self.add_class("ycb", 21, "061_foam_brick") 
 
         if subset == "test":
             fname="test.txt"
@@ -126,32 +125,28 @@ class synthiaDataset(utils.Dataset):
             fname="train.txt"
         
         # obtain the image ids
-        with open(fname) as f:
+        with open(os.path.join("datasets", "ycb", fname)) as f:
             content = f.readlines()
-        image_ids = [x.strip() for x in content]
+        image_paths = [x.strip() for x in content]
         
-        for image_id in image_ids:
-            if int(image_id)<201:
-                #Path=os.path.join(dataset_dir, "val","{}.png".format(image_id))
-                Path=os.path.join(dataset_dir,"{}.png".format(image_id))
-                self.add_image(
-                    "synthia",
-                    image_id=image_id,
-                    path=Path)
-            else:
-                #Path=os.path.join(dataset_dir, "train","{}.png".format(image_id))
-                Path=os.path.join(dataset_dir,"{}.png".format(image_id))
-                self.add_image(
-                    "synthia",
-                    image_id=image_id,
-                    path=Path)
+        for image_path in image_paths:
+            image_id = image_path[image_path.rfind('/')+1:]
+            image_id += "-color"
+            image_path += "-color"
+            #print image_id
+            Path=os.path.join(dataset_dir,"{}.png".format(image_path))
+            #print Path
+            self.add_image(
+                "ycb",
+                image_id=image_id,
+                path=Path)
     
     def load_image(self, image_id):
         """Load the specified image and return a [H,W,4] Numpy array.
         """
-        # this image_id is different from the image_id in the load_synthia function
+        # this image_id is different from the image_id in the load_ycb function
         # this image_id is the index of the image in the dataset object
-        # image_id in the load_synthia is the name of the image
+        # image_id in the load_ycb is the name of the image
         # Load image
         imgPath = self.image_info[image_id]['path']
         img=skimage.io.imread(imgPath)
@@ -160,8 +155,8 @@ class synthiaDataset(utils.Dataset):
     def image_reference(self, image_id):
         """Return the shapes data of the image."""
         info = self.image_info[image_id]
-        if info["source"] == "synthia":
-            return info["synthia"]
+        if info["source"] == "ycb":
+            return info["ycb"]
         else:
             super(self.__class__).image_reference(self, image_id)
 
@@ -170,45 +165,27 @@ class synthiaDataset(utils.Dataset):
         """
         info = self.image_info[image_id]
         path=info['path']
-        mpath=path.replace("RGB","GT/LABELS")
+        mpath = path[:path.find('-')+1] + "label.png"
+        #print mpath
         label=cv2.imread(mpath,cv2.IMREAD_UNCHANGED)
 
-        print label.shape
-
-        plt.imshow(label, interpolation="nearest")
-        plt.show()
+        # plt.imshow(label, interpolation="nearest")
+        # plt.show()
         #print mpath
-        raw_mask=label[:,:,1]
-
-        print raw_mask.shape
-
-
-        # plt.imshow(raw_mask, interpolation="nearest")
-        # plt.show()
-
-        # plt.imshow(label[:,:,0], interpolation="nearest")
-        # plt.show()
-
-        # plt.imshow(label[:,:,2], interpolation="nearest")
-        # plt.show()
-
-
-        number=np.unique(raw_mask)
+        #raw_mask=label[:,:,1]
+        number=np.unique(label)
         number=number[1:]
-        print image_id
-        print number
         # you should change the mask shape according to the image shape
-        mask = np.zeros([760, 1280, len(number)],dtype=np.uint8)
+        mask = np.zeros([480, 640, len(number)],dtype=np.uint8)
         class_ids=np.zeros([len(number)],dtype=np.uint32)
         for i,p in enumerate(number):
-            location=np.argwhere(raw_mask==p)
+            location=np.argwhere(label==p)
             mask[location[:,0], location[:,1], i] = 1
-            class_ids[i]=label[location[0,0],location[0,1],2]
-            print class_ids[i], p
+            class_ids[i]=p
             # plt.imshow(mask[:, :, i], interpolation="nearest")
             # plt.show()
 #        mask = [m for m in mask if set(np.unique(m).flatten()) != {0}]
-        raw_input()
+
         return mask.astype(np.bool), class_ids.astype(np.int32)
 
 ############################################################
@@ -220,14 +197,14 @@ if __name__ == '__main__':
 
     # Parse command line arguments
     parser = argparse.ArgumentParser(
-        description='Train Mask R-CNN on Synthia.')
+        description='Train Mask R-CNN on ycb video dataset.')
     parser.add_argument("command",
                         metavar="<command>",
-                        help="'train' or 'evaluate' on Synthia")
+                        help="'train' or 'evaluate' on ycb")
     parser.add_argument('--dataset', required=False,
-                        default="/mnt/backup/jianyuan/synthia/RAND_CITYSCAPES/RGB",
+                        default="/home/sui/Downloads/YCB_Video_Dataset/",
                         metavar="/path/to/coco/",
-                        help='Directory of the Synthia dataset')
+                        help='Directory of the ycb video dataset')
     parser.add_argument('--model', required=False,
                         metavar="/path/to/weights.pth",
                         help="Path to weights .pth file ")
@@ -252,9 +229,9 @@ if __name__ == '__main__':
 
     # Configurations
     if args.command == "train":
-        config = synthiaConfig()
+        config = ycbConfig()
     else:
-        class InferenceConfig(synthiaConfig):
+        class InferenceConfig(ycbConfig):
             # Set batch size to 1 since we'll be running inference on
             # one image at a time. Batch size = GPU_COUNT * IMAGES_PER_GPU
             GPU_COUNT = 1
@@ -318,13 +295,13 @@ if __name__ == '__main__':
 
     data_dir=args.dataset
     # Training dataset
-    dataset_train = synthiaDataset()
-    dataset_train.load_synthia(data_dir,"train")
+    dataset_train = ycbDataset()
+    dataset_train.load_ycb(data_dir,"train")
     dataset_train.prepare()
 
     # Validation dataset
-    dataset_val = synthiaDataset()
-    dataset_val.load_synthia(data_dir,"test")
+    dataset_val = ycbDataset()
+    dataset_val.load_ycb(data_dir,"test")
     dataset_val.prepare()
 
     # input parameters
