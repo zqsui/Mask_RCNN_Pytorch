@@ -323,7 +323,7 @@ if __name__ == '__main__':
         print("Training network heads")
         model.train_model(dataset_train, dataset_val,
                     learning_rate=lr,
-                    epochs=1,
+                    epochs=40,
                     BatchSize=batchsize,
                     steps=steps,
                     layers='heads')
@@ -333,7 +333,7 @@ if __name__ == '__main__':
         print("Fine tune Resnet stage 4 and up")
         model.train_model(dataset_train, dataset_val,
                     learning_rate=lr/2,
-                    epochs=3,
+                    epochs=120,
                     BatchSize=batchsize,
                     steps=steps,
                     layers='4+')
@@ -343,14 +343,15 @@ if __name__ == '__main__':
         print("Fine tune all layers")
         model.train_model(dataset_train, dataset_val,
                     learning_rate=lr / 10,
-                    epochs=15,
+                    epochs=160,
                     BatchSize=batchsize,
                     steps=steps,
                     layers='all')
 
     elif args.command == "evaluate":
         # Validation dataset
-        image_ids = np.random.choice(dataset_val.image_ids, 1)
+        #image_ids = np.random.choice(dataset_val.image_ids, 1)
+        image_ids = dataset_val.image_ids
         model.eval()
         APs = []
         for image_id in image_ids:
@@ -367,6 +368,7 @@ if __name__ == '__main__':
                 utils.compute_ap(gt_bbox, gt_class_id, gt_mask,
                                  r["rois"], r["class_ids"], r["scores"], r['masks'])
             APs.append(AP)
+            print image_id, AP
     
         print("mAP: ", np.mean(APs))
         

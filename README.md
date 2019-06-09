@@ -1,3 +1,19 @@
+# Useful Command
+* Train
+Prepare your own dataset python file (e.g. ycb.py) which organizes the images in the dataset 
+
+```
+python ycb.py train --dataset path_to_your_dataset --model=coco
+```
+
+* Test
+Prepare your own demo_dataset.py
+
+```
+python demo_ycb.py
+```
+
+
 # Mask_RCNN_Pytorch
 
 This is an implementation of the instance segmentation model [Mask R-CNN](https://arxiv.org/abs/1703.06870) on Pytorch, based on the previous work of [Matterport](https://github.com/matterport/Mask_RCNN) and [lasseha](https://github.com/multimodallearning/pytorch-mask-rcnn).  Matterport's repository is an implementation on Keras and TensorFlow while lasseha's repository is an implementation on Pytorch.

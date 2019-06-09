@@ -7,7 +7,6 @@ import skimage.io
 import matplotlib
 import matplotlib.pyplot as plt
 
-import coco
 import utils
 import model as modellib
 import visualize
@@ -86,14 +85,14 @@ if config.GPU_COUNT:
 
 # Load weights trained on MS-COCO
 #model.load_state_dict(torch.load(COCO_MODEL_PATH))
-model_path = "logs/ycb20190412T0046/mask_rcnn_ycb_0015.pth.pth"
+model_path = "logs/ycb_first_working/mask_rcnn_ycb_0040.pth"
 #model.find_last()[1]
 model.load_weights(model_path)
 # COCO Class names
 # Index of the class in the list is its ID. For example, to get ID of
 # the teddy bear class, use: class_names.index('teddy bear')
 #class_names = ["BG", "sky","Building","Road", "Sidewalk","Fence", "Vegetation","Pole", "Car","Traffic sign","Pedestrian","Bicycle","Motorcycle","Parking-slot" ,"Road-work","Traffic light","Terrain","Rider","Truck", "Bus", "Train", "Wall","Lanemarking"]
-class_names = ["002_master_chef_can", "003_cracker_box", "004_sugar_box", "005_tomato_soup_can", "006_mustard_bottle", "007_tuna_fish_can", "008_pudding_box", 
+class_names = ["background", "002_master_chef_can", "003_cracker_box", "004_sugar_box", "005_tomato_soup_can", "006_mustard_bottle", "007_tuna_fish_can", "008_pudding_box", 
           "009_gelatin_box", "010_potted_meat_can", "011_banana", "019_pitcher_base", "021_bleach_cleanser", "024_bowl", "025_mug", "035_power_drill", 
           "036_wood_block", "037_scissors", "040_large_marker", "051_large_clamp", "052_extra_large_clamp", "061_foam_brick"]
 
